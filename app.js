@@ -1,5 +1,7 @@
 //                       BLOG  PAGE
 
+
+
 window.onload = async function(){
   const { data, error } = await supabase
   .from('Post App Table')
