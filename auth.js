@@ -1,36 +1,100 @@
+// Signup Form
+
 function showSignup() {
     document.getElementById("loginForm").classList.add("d-none");
     document.getElementById("signupForm").classList.remove("d-none");
-
-    let signUpBtn = document.querySelector("#signup")
-
-    signUpBtn.addEventListener("click", async (event) => {
-        event.preventDefault()
-        let userEmail = document.querySelector("#userEmail")
-        let userPass = document.querySelector("#userPass")
-        console.log(userEmail.value)
-        console.log(userPass.value)
-
-        try {
-            const { data, error } = await client.auth.signUp({
-                email: userEmail.value,
-                password: userPass.value,
-            })
-            console.log(data)
-            console.log(error)
-        }
-        catch (error) {
-            console.log(error)
-        }
-
-    })
 }
+
+// Login Form
 
 function showLogin() {
     document.getElementById("signupForm").classList.add("d-none");
     document.getElementById("loginForm").classList.remove("d-none");
 }
 
-function goToDashboard() {
-    window.location.href = "dashboard.html";
+// Signup 
+
+async function signupUser(event) {
+    event.preventDefault();
+    let name = document.getElementById("userName").value;
+    let email = document.getElementById("userEmail").value;
+    let password = document.getElementById("userPass").value;
+
+    if(!email || !password){
+        Swal.fire({
+            icon:"error",
+            title:"Missing Data",
+            text:"Email and Password required"
+        });
+        return;
+    }
+
+    try {
+        const { data, error } = await client.auth.signUp({
+            email: email,
+            password: password,
+            options:{
+                data:{
+                    name:name
+                }
+            }
+        });
+
+        console.log("Signup Data:", data);
+        console.log("Signup Error:", error);
+
+        if(error){
+            Swal.fire({
+                icon:"error",
+                title:"Signup Failed",
+                text:error.message
+            });
+            return;
+        }
+        Swal.fire({
+            icon:"success",
+            title:"Account Created",
+            text:"Now you can login"
+        });
+        showLogin();
+    }
+    catch(error){
+        console.log(error);
+    }
+}
+
+async function loginUser(){
+    let email = document.getElementById("loginEmail").value;
+    let password = document.getElementById("loginPass").value;
+
+    if(!email || !password){
+        Swal.fire({
+            icon:"warning",
+            title:"Fill Fields",
+            text:"Email and Password required"
+        });
+        return;
+    }
+
+    try{
+        const { data, error } = await client.auth.signInWithPassword({
+            email:email,
+            password:password
+        });
+        console.log("Login Data:",data);
+        console.log("Login Error:",error);
+
+        if(error){
+            Swal.fire({
+                icon:"error",
+                title:"Login Failed",
+                text:error.message
+            });
+            return;
+        }
+        window.location.href="dashboard.html";
+    }
+    catch(error){
+        console.log(error);
+    }
 }

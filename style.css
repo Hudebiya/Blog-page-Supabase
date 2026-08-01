@@ -15,8 +15,6 @@ body{
     background-attachment:fixed;
 }
 
-/* Header */
-
 .header-bg{
     background:rgba(17,24,39,.9);
     box-shadow:0 8px 20px rgba(0,0,0,.3);
@@ -28,6 +26,7 @@ body{
     min-height:550px;
     position:sticky;
     top:20px;
+    background-color: rgb(233, 213, 243);
 }
 
 .form-card h3{
@@ -41,8 +40,6 @@ body{
 textarea{
     resize:none;
 }
-
-/* Theme Images */
 
 .bgImg{
     width:90px;
@@ -59,16 +56,12 @@ textarea{
 }
 
 .selectedImg{
-    border-color:#0d6efd;
+    border-color:#251f27;
 }
-
-/* Posts */
 
 #posts{
     width:100%;
 }
-
-/* Blog Card */
 
 .blog-card{
     background:#fff;
@@ -111,8 +104,6 @@ textarea{
     gap:10px;
     padding:0 18px 18px;
 }
-
-/* Responsive */
 
 @media(max-width:991px){
 

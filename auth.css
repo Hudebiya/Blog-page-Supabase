@@ -60,7 +60,7 @@ body{
 .auth-card{
     width:55%;
     padding:50px;
-    background:white;
+    background-color:rgb(226, 177, 241);
 }
 
 .auth-card h2{
