@@ -1,4 +1,4 @@
-                // BLOG PAGE 
+// BLOG PAGE 
 // import { createClient } from '@supabase/supabase-js'
 
 var cardBg = "assets/img-1.avif";
@@ -7,25 +7,26 @@ let edited = false;
 let editPostId = null;
 
 window.onload = async function () {
-const { data, error } = await client.auth.getSession();
-
+    const { data, error } = await client.auth.getSession();
     if (error) {
         console.log(error);
         return;
     }
-    if (!data.session) {
 
+    if (!data.session) {
         window.location.href = "index.html";
         return;
     }
-const { data: { user } } = await client.auth.getUser();
-console.log(user);
+    const { data: { user } } = await client.auth.getUser();
+    console.log("Logged User:", user);
 
-document.getElementById("displayData").innerHTML = user.email;
+    document.getElementById("displayData").innerHTML = user.email;
     loadPosts();
 }
 
 async function loadPosts() {
+    const { data: { user } } = await client.auth.getUser();
+       console.log("Current User:", user.id);
     try {
         const { data, error } = await client
             .from("blog-page")
@@ -85,6 +86,15 @@ async function post() {
     var description = document.getElementById("description");
 
     if (title.value.trim() && description.value.trim()) {
+        const { data: { user }, error } = await client.auth.getUser();
+
+        if (error) {
+            console.log(error);
+            return;
+        }
+
+        console.log("Current User:", user);
+        
         if (edited) {
             const { data, error } = await client
                 .from("blog-page")
@@ -95,8 +105,9 @@ async function post() {
                 })
                 .eq("id", editPostId)
                 .select();
-            console.log(data);
-            console.log(error);
+            console.log("Update Data:", data);
+            console.log("Update Error:", error);
+
 
             edited = false;
             editPostId = null;
@@ -110,7 +121,8 @@ async function post() {
                     {
                         title: title.value,
                         description: description.value,
-                        img_url: cardBg
+                        img_url: cardBg,
+                        user_id: user.id
                     }
                 ])
                 .select();
@@ -167,7 +179,10 @@ async function deletePost(event, id) {
         const { error } = await client
             .from("blog-page")
             .delete()
-            .eq("id", id);
+            .eq("id", id)
+            .select();
+            console.log("Delete Data:", data);
+           
         if (error) {
             console.log(error);
             Swal.fire({
@@ -176,6 +191,7 @@ async function deletePost(event, id) {
                 text: error.message
             });
             return;
+    
         }
         await loadPosts();
         Swal.fire({
@@ -199,14 +215,14 @@ function selectImg(src) {
     event.target.classList.add("selectedImg");
 }
 
-async function logout(){
-const { error } = await client.auth.signOut();
+async function logout() {
+    const { error } = await client.auth.signOut();
 
-if(error){
-  console.log(error);
-  return;
-}
- window.location.href = "index.html";
+    if (error) {
+        console.log(error);
+        return;
+    }
+    window.location.href = "index.html";
 }
 
 function showForm() {

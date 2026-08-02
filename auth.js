@@ -92,6 +92,9 @@ async function loginUser(){
             });
             return;
         }
+        const { data: sessionData } = await client.auth.getSession();
+        console.log("Session:", sessionData.session);
+        
         window.location.href="dashboard.html";
     }
     catch(error){
