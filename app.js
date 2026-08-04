@@ -18,15 +18,13 @@ window.onload = async function () {
         return;
     }
     const { data: { user } } = await client.auth.getUser();
-    console.log("Logged User:", user);
-
+    
     document.getElementById("displayData").innerHTML = user.email;
     loadPosts();
 }
 
 async function loadPosts() {
-    const { data: { user } } = await client.auth.getUser();
-       console.log("Current User:", user.id);
+    
     try {
         const { data, error } = await client
             .from("blog-page")
@@ -92,8 +90,6 @@ async function post() {
             console.log(error);
             return;
         }
-
-        console.log("Current User:", user);
         
         if (edited) {
             const { data, error } = await client
@@ -105,10 +101,7 @@ async function post() {
                 })
                 .eq("id", editPostId)
                 .select();
-            console.log("Update Data:", data);
-            console.log("Update Error:", error);
-
-
+            
             edited = false;
             editPostId = null;
             document.getElementById("postButton").innerHTML = "Post";
@@ -180,9 +173,7 @@ async function deletePost(event, id) {
             .from("blog-page")
             .delete()
             .eq("id", id)
-            .select();
-            console.log("Delete Data:", data);
-           
+            
         if (error) {
             console.log(error);
             Swal.fire({
