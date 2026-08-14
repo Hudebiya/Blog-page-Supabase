@@ -1,5 +1,4 @@
-// Signup Form
-
+//      Login / SignUp
 function showSignup() {
     document.getElementById("loginForm").classList.add("d-none");
     document.getElementById("signupForm").classList.remove("d-none");
@@ -20,11 +19,11 @@ async function signupUser(event) {
     let email = document.getElementById("userEmail").value;
     let password = document.getElementById("userPass").value;
 
-    if(!email || !password){
+    if (!email || !password) {
         Swal.fire({
-            icon:"error",
-            title:"Missing Data",
-            text:"Email and Password required"
+            icon: "error",
+            title: "Missing Data",
+            text: "Email and Password required"
         });
         return;
     }
@@ -33,9 +32,10 @@ async function signupUser(event) {
         const { data, error } = await client.auth.signUp({
             email: email,
             password: password,
-            options:{
-                data:{
-                    name:name
+            options: {
+                data: {
+                    name: name,
+                    role: "admin"
                 }
             }
         });
@@ -43,22 +43,22 @@ async function signupUser(event) {
         console.log("Signup Data:", data);
         console.log("Signup Error:", error);
 
-        if(error){
+        if (error) {
             Swal.fire({
-                icon:"error",
-                title:"Signup Failed",
-                text:error.message
+                icon: "error",
+                title: "Signup Failed",
+                text: error.message
             });
             return;
         }
         Swal.fire({
-            icon:"success",
-            title:"Account Created",
-            text:"Now you can login"
+            icon: "success",
+            title: "Account Created",
+            text: "Now you can login"
         });
         showLogin();
     }
-    catch(error){
+    catch (error) {
         console.log(error);
     }
 }
@@ -96,7 +96,20 @@ async function loginUser() {
 
         console.log("Session:", data.session);
 
-        window.location.href = "dashboard.html";
+        const user = data.user;
+
+        if (user.user_metadata.role !== "admin") {
+            Swal.fire({
+                icon: "error",
+                title: "Access Denied",
+                text: "You are not an admin!"
+            });
+
+            await client.auth.signOut();
+            return;
+        }
+
+        window.location.href = "admin.html";
 
     } catch (error) {
         console.log(error);

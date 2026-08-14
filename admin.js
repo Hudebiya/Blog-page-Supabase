@@ -34,99 +34,100 @@ window.onload = async function () {
 
 async function loadPosts() {
 
-    try {
-        const { data: { user } } = await client.auth.getUser();
+    const { data, error } = await client
+        .from("blog-page")
+        .select("*")
+        .order("id", { ascending: false });
 
-        const { data, error } = await client
-            .from("blog-page")
-            .select("*")
-            .eq("user_id", user.id)
-            .order("id", { ascending: false });
-        if (error) {
-            console.log(error);
-            return;
-        }
+    console.log("Posts:", data);
+    console.log("Error:", error);
 
-        var posts = document.getElementById("posts");
-        posts.innerHTML = "";
-        data.forEach(function (item) {
-            posts.innerHTML += `
-            <div class="col-12 col-md-6">
-                <div class="blog-card">
-
-                    <div class="blog-image"
-                    style="background-image:url('${item.img_url}')">
-                    </div>
-
-                    <div class="blog-content">
-                        <h5>${item.title}</h5>
-                        <p>${item.description}</p>
-                    </div>
-
-                    <div class="blog-btns">
-                        <button
-                        onclick="editPost(event,
-                        ${item.id},
-                        '${item.title}',
-                        '${item.description}',
-                        '${item.img_url}')"
-                        class="btn btn-success">
-                        Edit
-                        </button>
-
-                        <button
-                        onclick="deletePost(event,${item.id})"
-                        class="btn btn-danger">
-                        Delete
-                        </button>
-                    </div>
-                </div>
-            </div>
-            `;
-        });
-    }
-
-    catch (error) {
+    if (error) {
         console.log(error);
+        return;
     }
+
+    const postsContainer = document.getElementById("posts");
+
+    postsContainer.innerHTML = "";
+
+    data.forEach(function (post) {
+
+        postsContainer.innerHTML += `
+            <div class="post card m-2 p-3">
+
+                <h3>${post.title}</h3>
+
+                <p>${post.description}</p>
+
+                <img
+                    src="${post.img_url}"
+                    width="200"
+                    style="display:block;"
+                >
+
+                <p>${post.email}</p>
+
+                <button
+                    onclick="deletePost(${post.id})"
+                    class="btn btn-danger">
+                    Delete
+                </button>
+
+            </div>
+        `;
+
+    });
 }
 
+loadPosts();
+
 async function post() {
+
     var title = document.getElementById("title");
     var description = document.getElementById("description");
-    let imageFile = document.getElementById("background-image").files[0];
 
-    console.log(imageFile);
+    var imageInput = document.getElementById("background-image");
+    var imageFile = imageInput.files[0];
+
+    console.log("Image Input:", imageInput);
+    console.log("Image File:", imageFile);
 
     let imageUrl = "";
 
-    if (imageFile) {
+if (imageFile) {
 
-        let fileName = `${Date.now()}-${imageFile.name}`;
+    let fileName = `${Date.now()}-${imageFile.name}`;
 
-        const { error: uploadError } = await client
-            .storage
-            .from("post-images")
-            .upload(fileName, imageFile, {
-                cacheControl: "3600",
-                upsert: false
-            });
+    const { error: uploadError } = await client
+        .storage
+        .from("post-images")
+        .upload(fileName, imageFile, {
+            cacheControl: "3600",
+            upsert: false
+        });
 
-        if (uploadError) {
-            console.log("Upload Error:", uploadError);
-            alert("Image Upload Failed!");
-            return;
-        }
-
-        const { data: imageData } = client
-            .storage
-            .from("post-images")
-            .getPublicUrl(fileName);
-
-        imageUrl = imageData.publicUrl;
-
-        console.log("Image URL:", imageUrl);
+    if (uploadError) {
+        console.log("Upload Error:", uploadError);
+        alert("Image Upload Failed!");
+        return;
     }
+
+    const { data: imageData } = client
+        .storage
+        .from("post-images")
+        .getPublicUrl(fileName);
+
+    imageUrl = imageData.publicUrl;
+
+    console.log("Uploaded Image URL:", imageUrl);
+
+} else {
+
+    imageUrl = cardBg;
+
+    console.log("Selected Theme Image:", imageUrl);
+}
 
     if (title.value.trim() && description.value.trim()) {
         const { data: { user }, error } = await client.auth.getUser();
@@ -142,7 +143,7 @@ async function post() {
                 .update({
                     title: title.value,
                     description: description.value,
-                    img_url: cardBg
+                    img_url: imageUrl
                 })
                 .eq("id", editPostId)
                 .select();
@@ -165,8 +166,12 @@ async function post() {
                     }
                 ])
                 .select();
-            console.log(data);
-            console.log(error);
+            // console.log(data);
+            // console.log(error);
+
+            console.log("POST DATA:", data);
+            console.log("IMAGE URL SAVED:", data[0]?.img_url);
+            console.log("ERROR:", error);
         }
 
         document.getElementById("title").value = "";
@@ -244,6 +249,7 @@ async function deletePost(event, id) {
 
 function selectImg(src) {
     cardBg = src;
+     console.log("Selected Theme Image:", cardBg);
     var images = document.getElementsByClassName("bgImg");
 
     for (var i = 0; i < images.length; i++) {
@@ -331,4 +337,8 @@ Delete
         `;
     });
 
+}
+
+function showSelectedImage(event) {
+    console.log("SELECTED FILE:", event.target.files[0]);
 }
