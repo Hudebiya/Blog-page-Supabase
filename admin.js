@@ -19,7 +19,7 @@ window.onload = async function () {
     }
     const { data: { user } } = await client.auth.getUser();
 
-    let name = user.user_metadata.name;
+    let name = user.user_metadata.name || user.email || "User";
 
     document.getElementById("userAvatar").innerHTML =
         name.charAt(0).toUpperCase();
@@ -54,28 +54,30 @@ async function loadPosts() {
     data.forEach(function (post) {
 
         postsContainer.innerHTML += `
-            <div class="post card m-2 p-3">
+    <div class="col-12 col-md-6 col-lg-4 mb-3">
+        <div class="post card p-3">
 
-                <h3>${post.title}</h3>
+            <h3>${post.title}</h3>
 
-                <p>${post.description}</p>
+            <p>${post.description}</p>
 
-                <img
-                    src="${post.img_url}"
-                    width="200"
-                    style="display:block;"
-                >
+            <img
+                src="${post.img_url}"
+                width="200"
+                style="display:block;"
+            >
 
-                <p>${post.email}</p>
+            <p>${post.email}</p>
 
-                <button
-                    onclick="deletePost(${post.id})"
-                    class="btn btn-danger">
-                    Delete
-                </button>
+            <button
+                onclick="deletePost(${post.id})"
+                class="btn btn-danger">
+                Delete
+            </button>
 
-            </div>
-        `;
+        </div>
+    </div>
+`;
 
     });
 }

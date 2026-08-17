@@ -19,7 +19,7 @@ window.onload = async function () {
     }
     const { data: { user } } = await client.auth.getUser();
 
-    let name = user.user_metadata.name;
+    let name = user.user_metadata.name || user.email || "User";
 
     document.getElementById("userAvatar").innerHTML =
         name.charAt(0).toUpperCase();
@@ -27,8 +27,6 @@ window.onload = async function () {
     document.getElementById("userName").innerHTML =
         name;
 
-    document.getElementById("userEmail").innerHTML =
-        user.email;
     loadPosts();
 }
 
@@ -142,7 +140,7 @@ async function post() {
                 .update({
                     title: title.value,
                     description: description.value,
-                    img_url: cardBg
+                    img_url: imageFile ? imageUrl : cardBg
                 })
                 .eq("id", editPostId)
                 .select();
@@ -159,7 +157,7 @@ async function post() {
                     {
                         title: title.value,
                         description: description.value,
-                        img_url: imageUrl,
+                        img_url: imageFile ? imageUrl : cardBg,
                         user_id: user.id,
                         email: user.email
                     }
